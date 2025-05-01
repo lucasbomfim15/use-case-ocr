@@ -11,27 +11,30 @@ import { Env } from "src/env";
 import AuthenticateController from "./controller/authenticate-account.controller";
 import JwtStrategy from "./jwt/jwt.strategy";
 
-
 @Module({
-    imports: [PrismaModule, PassportModule, JwtModule.registerAsync({
-       inject: [ConfigService],
-       global: true,
-       useFactory(config: ConfigService<Env, true>) {
+  imports: [
+    PrismaModule,
+    PassportModule,
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      global: true,
+      useFactory(config: ConfigService<Env, true>) {
         const privateKey = config.get("JWT_PRIVATE_KEY", { infer: true });
         const publicKey = config.get("JWT_PUBLIC_KEY", { infer: true });
 
         return {
-            signOptions: {
-                algorithm: "RS256",
-            },
-            privateKey: Buffer.from(privateKey, "base64"),
-            publicKey: Buffer.from(publicKey, "base64"),
-        }
-       },
-    })
-    ],
-    controllers: [CreateAccountController, AuthenticateController],
-    providers: [AuthService, UsersRepository, JwtStrategy],
-    exports: [],
+          signOptions: {
+            algorithm: "RS256",
+            expiresIn: "1d", 
+          },
+          privateKey: Buffer.from(privateKey, "base64").toString("utf-8"),
+          publicKey: Buffer.from(publicKey, "base64").toString("utf-8"),
+        };
+      },
+    }),
+  ],
+  controllers: [CreateAccountController, AuthenticateController],
+  providers: [AuthService, UsersRepository, JwtStrategy],
+  exports: [AuthService, JwtModule],
 })
 export class AuthModule {}

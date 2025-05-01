@@ -17,7 +17,7 @@ export default class JwtStrategy extends PassportStrategy(Strategy) {
     const publicKey = config.get("JWT_PUBLIC_KEY", { infer: true });
 
     super({
-      secretOrKey: publicKey,
+      secretOrKey:  Buffer.from(publicKey, 'base64').toString('utf-8'),
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       algorithms: ["RS256"],
     });
