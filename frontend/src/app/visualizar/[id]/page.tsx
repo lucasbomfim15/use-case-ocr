@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams, useRouter } from 'next/navigation';
-import { FileText, Bot, ArrowLeft, Download } from 'lucide-react';
+import { FileText, Bot, ArrowLeft, Download, Trash } from 'lucide-react';
 
 interface Document {
   id: string;
@@ -47,6 +47,25 @@ export default function VisualizarDocumento() {
     window.open(`${downloadUrl}?token=${token}`, '_blank');
   };
 
+  const handleDelete = async () => {
+    const confirm = window.confirm('Tem certeza que deseja deletar este documento?');
+    if (!confirm) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://localhost:3003/documents/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      alert('Documento deletado com sucesso.');
+      router.push('/dashboard');
+    } catch (error) {
+      console.error('Erro ao deletar documento:', error);
+      alert('Erro ao deletar o documento.');
+    }
+  };
+
   if (loading) return <div className="text-gray-400 p-6">Carregando documento...</div>;
   if (!documento) return <div className="text-red-500 p-6">Documento não encontrado.</div>;
 
@@ -58,7 +77,7 @@ export default function VisualizarDocumento() {
         </h1>
         <button
           onClick={() => router.push('/dashboard')}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 transition rounded-xl text-white"
+          className="cursor-pointer flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 transition rounded-xl text-white"
         >
           <ArrowLeft size={18} /> Voltar para a Dashboard
         </button>
@@ -72,12 +91,20 @@ export default function VisualizarDocumento() {
               {new Date(documento.createdAt).toLocaleString()}
             </span>
           </p>
-          <button
-            onClick={handleDownload}
-            className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 transition rounded-lg text-white"
-          >
-            <Download size={16} /> Baixar PDF original
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={handleDownload}
+              className="cursor-pointer flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 transition rounded-lg text-white"
+            >
+              <Download size={16} /> Baixar PDF original
+            </button>
+            <button
+              onClick={handleDelete}
+              className="cursor-pointer flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 transition rounded-lg text-white"
+            >
+              <Trash size={16} /> Deletar Documento
+            </button>
+          </div>
         </div>
 
         <section className="mb-8">
