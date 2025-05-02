@@ -42,6 +42,23 @@ const Dashboard = () => {
     router.push("/login");
   };
 
+  const handleDelete = async (id: string) => {
+    if (confirm("Tem certeza que deseja deletar este documento?")) {
+      try {
+        const token = localStorage.getItem("token");
+        await axios.delete(`http://localhost:3003/documents/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setDocuments((prev) => prev.filter((doc) => doc.id !== id));
+      } catch (error) {
+        console.error("Erro ao deletar documento:", error);
+        alert("Não foi possível deletar o documento.");
+      }
+    }
+  };
+
   return (
     <div className="bg-gray-950 text-white min-h-screen p-6">
       <header className="flex justify-between items-center mb-8">
@@ -49,13 +66,13 @@ const Dashboard = () => {
         <div className="flex gap-4">
           <button
             onClick={handleLogout}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition duration-200"
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition duration-200 cursor-pointer"
           >
             🔒 Sair
           </button>
           <a
             href="/upload"
-            className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition duration-200"
+            className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition duration-200 cursor-pointer"
           >
             ➕ Enviar novo documento
           </a>
@@ -96,45 +113,54 @@ const Dashboard = () => {
                 </div>
               )}
 
-              <button
-                onClick={async () => {
-                  try {
-                    const token = localStorage.getItem("token");
-                    const format = "pdf";
-                    const url = `http://localhost:3003/documents/${doc.id}/download?format=${format}`;
+              <div className="flex flex-wrap items-center mt-2 gap-4">
+                <button
+                  onClick={async () => {
+                    try {
+                      const token = localStorage.getItem("token");
+                      const format = "pdf";
+                      const url = `http://localhost:3003/documents/${doc.id}/download?format=${format}`;
 
-                    const response = await axios.get(url, {
-                      headers: {
-                        Authorization: `Bearer ${token}`,
-                      },
-                      responseType: "blob",
-                    });
+                      const response = await axios.get(url, {
+                        headers: {
+                          Authorization: `Bearer ${token}`,
+                        },
+                        responseType: "blob",
+                      });
 
-                    const blob = new Blob([response.data]);
-                    const downloadUrl = window.URL.createObjectURL(blob);
-                    const link = document.createElement("a");
-                    link.href = downloadUrl;
-                    link.download = `documento.${format}`;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    window.URL.revokeObjectURL(downloadUrl);
-                  } catch (error) {
-                    console.error("Erro ao baixar documento:", error);
-                    alert("Falha ao baixar o documento. Verifique sua autenticação.");
-                  }
-                }}
-                className="mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm transition duration-200"
-              >
-                ⬇️ Baixar documento
-              </button>
+                      const blob = new Blob([response.data]);
+                      const downloadUrl = window.URL.createObjectURL(blob);
+                      const link = document.createElement("a");
+                      link.href = downloadUrl;
+                      link.download = `documento.${format}`;
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                      window.URL.revokeObjectURL(downloadUrl);
+                    } catch (error) {
+                      console.error("Erro ao baixar documento:", error);
+                      alert("Falha ao baixar o documento. Verifique sua autenticação.");
+                    }
+                  }}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm transition duration-200 cursor-pointer"
+                >
+                  ⬇️ Baixar documento
+                </button>
 
-              <button
-                onClick={() => router.push(`/visualizar/${doc.id}`)}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-sm transition duration-200 ml-4"
-              >
-                🔍 Visualizar documento
-              </button>
+                <button
+                  onClick={() => router.push(`/visualizar/${doc.id}`)}
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-sm transition duration-200 cursor-pointer"
+                >
+                  🔍 Visualizar documento
+                </button>
+
+                <button
+                  onClick={() => handleDelete(doc.id)}
+                  className="px-4 py-2 bg-red-700 hover:bg-red-800 rounded-lg text-sm transition duration-200 cursor-pointer ml-auto"
+                >
+                  🗑️ Deletar documento
+                </button>
+              </div>
             </div>
           ))}
         </div>
