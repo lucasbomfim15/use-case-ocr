@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Document {
   id: string;
@@ -12,9 +13,54 @@ interface Document {
   createdAt: string;
 }
 
+interface ConfirmModalProps {
+  isOpen: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+const ConfirmModal: React.FC<ConfirmModalProps> = ({ isOpen, onConfirm, onCancel }) => {
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.div
+            className="bg-gray-800 p-6 rounded-2xl text-white w-full max-w-sm shadow-lg"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+          >
+            <h2 className="text-lg font-bold mb-4">Deseja mesmo deletar este documento?</h2>
+            <div className="flex justify-end gap-4">
+              <button
+                className="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg"
+                onClick={onCancel}
+              >
+                Cancelar
+              </button>
+              <button
+                className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg"
+                onClick={onConfirm}
+              >
+                Deletar
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
 const Dashboard = () => {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -42,25 +88,32 @@ const Dashboard = () => {
     router.push("/login");
   };
 
-  const handleDelete = async (id: string) => {
-    if (confirm("Tem certeza que deseja deletar este documento?")) {
-      try {
-        const token = localStorage.getItem("token");
-        await axios.delete(`http://localhost:3003/documents/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setDocuments((prev) => prev.filter((doc) => doc.id !== id));
-      } catch (error) {
-        console.error("Erro ao deletar documento:", error);
-        alert("Não foi possível deletar o documento.");
-      }
+  const confirmDelete = async () => {
+    if (!deleteId) return;
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`http://localhost:3003/documents/${deleteId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setDocuments((prev) => prev.filter((doc) => doc.id !== deleteId));
+    } catch (error) {
+      console.error("Erro ao deletar documento:", error);
+      alert("Não foi possível deletar o documento.");
+    } finally {
+      setDeleteId(null);
     }
   };
 
   return (
     <div className="bg-gray-950 text-white min-h-screen p-6">
+      <ConfirmModal
+        isOpen={!!deleteId}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteId(null)}
+      />
+
       <header className="flex justify-between items-center mb-8">
         <h1 className="text-4xl font-bold text-blue-400">📄 Seus Documentos</h1>
         <div className="flex gap-4">
@@ -91,10 +144,7 @@ const Dashboard = () => {
               className="bg-gray-800 border border-gray-700 p-6 rounded-2xl shadow-lg hover:shadow-blue-500/20 transition duration-300"
             >
               <p className="text-xs text-gray-400 mb-2">
-                Criado em:{" "}
-                <span className="text-white font-mono">
-                  {new Date(doc.createdAt).toLocaleString()}
-                </span>
+                Criado em: <span className="text-white font-mono">{new Date(doc.createdAt).toLocaleString()}</span>
               </p>
 
               <div className="mb-4">
@@ -118,21 +168,18 @@ const Dashboard = () => {
                   onClick={async () => {
                     try {
                       const token = localStorage.getItem("token");
-                      const format = "pdf";
-                      const url = `http://localhost:3003/documents/${doc.id}/download?format=${format}`;
-
+                      const url = `http://localhost:3003/documents/${doc.id}/download?format=pdf`;
                       const response = await axios.get(url, {
                         headers: {
                           Authorization: `Bearer ${token}`,
                         },
                         responseType: "blob",
                       });
-
                       const blob = new Blob([response.data]);
                       const downloadUrl = window.URL.createObjectURL(blob);
                       const link = document.createElement("a");
                       link.href = downloadUrl;
-                      link.download = `documento.${format}`;
+                      link.download = `documento.pdf`;
                       document.body.appendChild(link);
                       link.click();
                       document.body.removeChild(link);
@@ -155,7 +202,7 @@ const Dashboard = () => {
                 </button>
 
                 <button
-                  onClick={() => handleDelete(doc.id)}
+                  onClick={() => setDeleteId(doc.id)}
                   className="px-4 py-2 bg-red-700 hover:bg-red-800 rounded-lg text-sm transition duration-200 cursor-pointer ml-auto"
                 >
                   🗑️ Deletar documento
