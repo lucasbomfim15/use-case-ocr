@@ -11,6 +11,7 @@ import {
   Query,
   NotFoundException,
   Res,
+  Delete,
 
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -65,6 +66,13 @@ export class DocumentsController {
     res.setHeader('Content-Disposition', `attachment; filename=document.${format}`);
     res.setHeader('Content-Type', file.contentType);
     res.send(file.buffer);
+  }
+
+  @Delete('/:id')
+  @UseGuards(JwtAuthGuard)
+  async deleteDocument(@Param('id') id: string, @Request() req) {
+    const userId = req.user.sub;
+    return this.documentsService.deleteDocument(userId, id);
   }
 
 

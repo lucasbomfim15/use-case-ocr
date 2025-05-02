@@ -92,4 +92,16 @@ export class DocumentsService {
 
     return null;
   }
+
+  async deleteDocument(userId: string, documentId: string) {
+    const document = await this.prisma.document.findFirst({
+      where: { id: documentId, userId },
+    });
+
+    if (!document) {
+      throw new NotFoundException('Document not found');
+    }
+
+    await this.prisma.document.delete({ where: { id: documentId } });
+  }
 }
