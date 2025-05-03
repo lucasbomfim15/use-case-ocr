@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams, useRouter } from 'next/navigation';
 import { FileText, Bot, ArrowLeft, Download, Trash } from 'lucide-react';
+import DocumentViewer from '@/components/documentViewer';// ajuste o caminho se necessário
 
 interface Document {
   id: string;
@@ -107,25 +108,11 @@ export default function VisualizarDocumento() {
           </div>
         </div>
 
-        <section className="mb-8">
-          <h2 className="flex items-center gap-2 text-lg font-semibold text-blue-300 mb-2">
-            <FileText size={18} /> Texto extraído:
-          </h2>
-          <div className="bg-gray-900 p-4 rounded-lg max-h-64 overflow-y-auto text-sm text-gray-200 border border-gray-700">
-            <pre className="whitespace-pre-wrap">{documento.extractedText}</pre>
-          </div>
-        </section>
-
-        {documento.llmResponse && (
-          <section>
-            <h2 className="flex items-center gap-2 text-lg font-semibold text-purple-300 mb-2">
-              <Bot size={18} /> Resposta do LLM:
-            </h2>
-            <div className="bg-gray-900 p-4 rounded-lg max-h-64 overflow-y-auto text-sm text-green-400 border border-gray-700">
-              <pre className="whitespace-pre-wrap">{documento.llmResponse}</pre>
-            </div>
-          </section>
-        )}
+        {/* Aqui entra o novo componente */}
+        <DocumentViewer
+          extractedText={documento.extractedText}
+          llmResponse={documento.llmResponse}
+        />
       </div>
     </div>
   );
