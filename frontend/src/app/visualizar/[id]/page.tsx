@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useParams, useRouter } from 'next/navigation';
 import { FileText, Bot, ArrowLeft, Download, Trash } from 'lucide-react';
 import DocumentViewer from '@/components/documentViewer';// ajuste o caminho se necessário
+import ConfirmModal from '@/components/ConfirmMoldal';
 
 interface Document {
   id: string;
@@ -18,6 +19,7 @@ export default function VisualizarDocumento() {
   const router = useRouter();
   const [documento, setDocumento] = useState<Document | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   useEffect(() => {
     const fetchDocumento = async () => {
@@ -49,9 +51,10 @@ export default function VisualizarDocumento() {
   };
 
   const handleDelete = async () => {
-    const confirm = window.confirm('Tem certeza que deseja deletar este documento?');
-    if (!confirm) return;
+    setShowConfirmModal(true);
+  };
 
+  const confirmDelete = async () => {
     try {
       const token = localStorage.getItem('token');
       await axios.delete(`http://localhost:3003/documents/${id}`, {
@@ -64,6 +67,8 @@ export default function VisualizarDocumento() {
     } catch (error) {
       console.error('Erro ao deletar documento:', error);
       alert('Erro ao deletar o documento.');
+    } finally {
+      setShowConfirmModal(false);
     }
   };
 
@@ -72,6 +77,11 @@ export default function VisualizarDocumento() {
 
   return (
     <div className="bg-gray-950 text-white min-h-screen px-6 py-8">
+      <ConfirmModal
+        isOpen={showConfirmModal}
+        onConfirm={confirmDelete}
+        onCancel={() => setShowConfirmModal(false)}
+      />
       <header className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-blue-400 flex items-center gap-2">
           <FileText size={28} /> Visualizar Documento
