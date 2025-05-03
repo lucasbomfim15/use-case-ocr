@@ -5,6 +5,7 @@ export const envSchema = z.object({
     JWT_PRIVATE_KEY: z.string(),
     JWT_PUBLIC_KEY: z.string(),
     PORT: z.coerce.number().default(3000),
+    FRONTEND_URL: z.string().url(),
 
 })
 
