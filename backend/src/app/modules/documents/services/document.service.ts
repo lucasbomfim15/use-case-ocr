@@ -95,6 +95,9 @@ export class DocumentsService {
 
     return null;
   }
+  async askLLM(extractedText: string, question: string) {
+    return this.groq.askAboutDocument(extractedText, question);
+  }
 
   async deleteDocument(userId: string, documentId: string) {
     const document = await this.prisma.document.findFirst({

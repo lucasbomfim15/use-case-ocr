@@ -112,6 +112,7 @@ export default function VisualizarDocumento() {
         <DocumentViewer
           extractedText={documento.extractedText}
           llmResponse={documento.llmResponse}
+          documentId={documento.id}
         />
       </div>
     </div>

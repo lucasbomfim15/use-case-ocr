@@ -12,6 +12,7 @@ import {
   NotFoundException,
   Res,
   Delete,
+  Body,
 
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -48,6 +49,24 @@ export class DocumentsController {
     const userId = req.user.sub;
     const documentId = req.params.id;
     return this.documentsService.getDocumentById(userId, documentId);
+  }
+
+  @Post('/:id/ask')
+  @UseGuards(JwtAuthGuard)
+  async askAboutDocument(
+    @Param('id') documentId: string,
+    @Request() req,
+    @Body('question') question: string
+  ) {
+    const userId = req.user.sub;
+    const document = await this.documentsService.getDocumentById(userId, documentId);
+
+    if (!document || !document.extractedText) {
+      throw new NotFoundException('Documento não encontrado ou sem conteúdo OCR.');
+    }
+
+    const response = await this.documentsService.askLLM(document.extractedText, question);
+    return { response };
   }
 
   @Get(':id/download')

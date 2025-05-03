@@ -37,4 +37,29 @@ Texto: """${text}"""`;
       throw new Error('Falha ao analisar texto com Groq');
     }
   }
+
+
+  async askAboutDocument(text: string, question: string): Promise<string> {
+    const prompt = `Baseado no seguinte conteúdo de documento:
+  
+  """${text}"""
+  
+  Responda à pergunta: "${question}"`;
+  
+    try {
+      const chatResponse = await this.groq.chat.completions.create({
+        model: 'llama3-70b-8192',
+        messages: [
+          { role: 'user', content: prompt },
+        ],
+        temperature: 0.5,
+        max_tokens: 1024,
+      });
+  
+      return chatResponse.choices[0]?.message?.content ?? 'Sem resposta da LLM.';
+    } catch (error) {
+      console.error('Erro na Groq ao responder pergunta:', error);
+      throw new Error('Falha ao perguntar à LLM');
+    }
+  }
 }
