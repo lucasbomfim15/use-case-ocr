@@ -7,11 +7,12 @@ import * as bcrypt from "bcryptjs";
 import { User } from "@prisma/client";
 import { JwtService } from "@nestjs/jwt";
 import { compare } from "bcryptjs";
+import { IAuthService } from "../interfaces/auth-service.interface";
 
 
 
 @Injectable()
-export default class AuthService {
+export default class AuthService implements IAuthService{
     constructor(private readonly usersRepository: UsersRepository,
                 private readonly prismaService: PrismaService,
                 private readonly jwt: JwtService

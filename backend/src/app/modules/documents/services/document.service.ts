@@ -1,4 +1,3 @@
-// src/app/modules/documents/services/document.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/app/shared/prisma/prisma.service';
 import * as Tesseract from 'tesseract.js';
@@ -7,9 +6,10 @@ import * as PDFDocument from 'pdfkit';
 import * as stream from 'stream';
 import { DownloadFile } from '../interfaces/downloadFile.interface';
 import { formatDanfText } from 'src/app/shared/utils/format-danf-text';
+import { IDocumentsService } from '../interfaces/documents-service.interface';
 
 @Injectable()
-export class DocumentsService {
+export class DocumentsService implements IDocumentsService {
   constructor(
     private prisma: PrismaService,
     private groq: GroqService 

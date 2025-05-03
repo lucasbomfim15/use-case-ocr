@@ -1,4 +1,3 @@
-// src/app/documents/documents.controller.ts
 import {
   Controller,
   Post,
@@ -21,10 +20,11 @@ import { DocumentsService } from '../services/document.service';
 import JwtAuthGuard from '../../auth/jwt/jwt-auth.guard';
 import { get } from 'http';
 import { Response } from 'express';
+import { IDocumentsController } from '../interfaces/document-controller.interface';
 
 
 @Controller('/documents')
-export class DocumentsController {
+export class DocumentsController implements IDocumentsController {
   constructor(private readonly documentsService: DocumentsService) {}
 
   @Post('/upload')
