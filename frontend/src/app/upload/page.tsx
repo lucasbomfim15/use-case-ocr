@@ -31,7 +31,7 @@ const UploadPage = () => {
       setUploading(true);
       const token = localStorage.getItem('token');
 
-      await axios.post('http://localhost:3003/documents/upload', formData, {
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/documents/upload`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
@@ -71,6 +71,10 @@ const UploadPage = () => {
           onChange={handleFileChange}
           className="block w-full p-2 bg-gray-800 rounded-lg"
         />
+        <p className="text-sm text-gray-400 mt-1">
+  Formatos aceitos: <span className="font-medium text-white">PNG, JPG</span>.
+  PDFs ainda não são suportados.
+</p>
 
         {error && <p className="text-red-500">{error}</p>}
 

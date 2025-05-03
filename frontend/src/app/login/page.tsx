@@ -34,20 +34,20 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-950 text-white px-4">
       <div className="flex w-full max-w-5xl rounded-xl overflow-hidden bg-[#0f172a]">
 
-        {/* Seção esquerda */}
+       
         <div className="w-1/2 bg-[#1e293b] p-10 flex flex-col justify-center items-center text-center">
           <h2 className="text-2xl font-bold text-blue-500 mb-4">Bem-vindo de Volta!</h2>
           <p className="text-sm text-gray-300 mb-6">
             Organize e acesse seus documentos com<br />praticidade e segurança.
           </p>
           <img
-            src="/imagem02.svg" // Substitua pelo caminho real da sua imagem
+            src="/imagem02.svg"
             alt="Ilustração"
             className="w-3/4 max-w-sm h-auto"
           />
         </div>
 
-        {/* Seção direita */}
+       
         <form
           onSubmit={handleLogin}
           className="w-1/2 p-10 flex flex-col justify-center bg-[#0f172a]"

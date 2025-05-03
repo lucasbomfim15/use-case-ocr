@@ -26,7 +26,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
       const token = localStorage.getItem('token');
 
       const response = await axios.post(
-        `http://localhost:3003/documents/${documentId}/ask`,
+        `${process.env.NEXT_PUBLIC_API_URL}/documents/${documentId}/ask`,
         { question },
         {
           headers: {

@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams, useRouter } from 'next/navigation';
 import { FileText, Bot, ArrowLeft, Download, Trash } from 'lucide-react';
-import DocumentViewer from '@/components/documentViewer';// ajuste o caminho se necessário
-import ConfirmModal from '@/components/ConfirmMoldal';
+import DocumentViewer from '@/components/documentViewer'; // ajuste o caminho se necessário
+import ConfirmModal from '@/components/ConfirmMoldal'; // corrigido o nome do arquivo
 
 interface Document {
   id: string;
@@ -25,7 +25,7 @@ export default function VisualizarDocumento() {
     const fetchDocumento = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get(`http://localhost:3003/documents/${id}`, {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/documents/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -42,22 +42,44 @@ export default function VisualizarDocumento() {
     if (id) fetchDocumento();
   }, [id]);
 
-  const handleDownload = () => {
-    const token = localStorage.getItem('token');
-    if (!id || !token) return;
-
-    const downloadUrl = `http://localhost:3003/documents/${id}/download?format=pdf`;
-    window.open(`${downloadUrl}?token=${token}`, '_blank');
+  const handleDownload = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!id || !token) return;
+  
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/documents/${id}/download?format=pdf`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          responseType: 'blob',
+        }
+      );
+  
+      const blob = new Blob([response.data]);
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = 'documento.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+    } catch (error) {
+      console.error('Erro ao baixar documento:', error);
+      alert('Falha ao baixar o documento. Verifique sua autenticação.');
+    }
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     setShowConfirmModal(true);
   };
 
   const confirmDelete = async () => {
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:3003/documents/${id}`, {
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/documents/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -82,6 +104,7 @@ export default function VisualizarDocumento() {
         onConfirm={confirmDelete}
         onCancel={() => setShowConfirmModal(false)}
       />
+
       <header className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-blue-400 flex items-center gap-2">
           <FileText size={28} /> Visualizar Documento
@@ -118,7 +141,6 @@ export default function VisualizarDocumento() {
           </div>
         </div>
 
-        {/* Aqui entra o novo componente */}
         <DocumentViewer
           extractedText={documento.extractedText}
           llmResponse={documento.llmResponse}

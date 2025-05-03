@@ -67,7 +67,7 @@ const Dashboard = () => {
     const fetchDocuments = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:3003/documents", {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/documents`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -92,7 +92,7 @@ const Dashboard = () => {
     if (!deleteId) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:3003/documents/${deleteId}`, {
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/documents/${deleteId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -168,7 +168,7 @@ const Dashboard = () => {
                   onClick={async () => {
                     try {
                       const token = localStorage.getItem("token");
-                      const url = `http://localhost:3003/documents/${doc.id}/download?format=pdf`;
+                      const url = `${process.env.NEXT_PUBLIC_API_URL}/documents/${doc.id}/download?format=pdf`;
                       const response = await axios.get(url, {
                         headers: {
                           Authorization: `Bearer ${token}`,
