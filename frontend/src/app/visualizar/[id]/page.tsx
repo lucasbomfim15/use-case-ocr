@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams, useRouter } from 'next/navigation';
-import { FileText, Bot, ArrowLeft, Download, Trash } from 'lucide-react';
-import DocumentViewer from '@/components/documentViewer'; // ajuste o caminho se necessário
-import ConfirmModal from '@/components/ConfirmMoldal'; // corrigido o nome do arquivo
+import { FileText, ArrowLeft, Download, Trash } from 'lucide-react';
+import DocumentViewer from '@/components/documentViewer'; 
+import ConfirmModal from '@/components/ConfirmMoldal'; 
 
 interface Document {
   id: string;
