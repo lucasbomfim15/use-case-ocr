@@ -4,7 +4,6 @@ import AuthService from "../service/auth-service";
 import { CreateAccountDTO } from "../dtos/create-account.dto";
 import { User } from "@prisma/client";
 import { z } from "zod";
-import { ZodValidationPipe } from "../pipes/zod-validation.pipe";
 import { ICreateAccountController } from "../interfaces/create-account-controller.interface";
 
 
